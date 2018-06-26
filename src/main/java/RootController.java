@@ -1,5 +1,3 @@
-package server;
-
 public class RootController {
 
     public static void main(String[] args) {
