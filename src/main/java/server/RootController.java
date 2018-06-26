@@ -1,6 +1,6 @@
 package server;
 
-public class ServerController {
+public class RootController {
 
     public static void main(String[] args) {
 
