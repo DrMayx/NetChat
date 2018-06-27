@@ -90,7 +90,7 @@ public class ServerController {
                             }
                         } catch (IOException e) {
                             //e.printStackTrace();
-                            System.out.println("Error with sending message to client!");
+                            System.out.println("Error with sending message to client!");;
                             return;
                         }
                     });

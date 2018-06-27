@@ -42,7 +42,7 @@ public class ClientController {
             }catch (ClassNotFoundException e){
                 System.out.println("Class not found");
             }
-            new DisplayMessageClient(in).start();
+            new DisplayMessageClient(in, this._clientName).start();
             new SendMessageClient(out, scan, this._clientName).start();
         } catch (IOException e) {
             e.printStackTrace();

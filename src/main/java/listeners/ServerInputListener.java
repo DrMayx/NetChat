@@ -5,6 +5,7 @@ import util.Message;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,6 +48,8 @@ public class ServerInputListener extends Thread{
         clients.forEach(client -> {
             try {
                 client.writeObject(new Message(message, "SERVER"));
+            }catch(SocketException e){
+                //do nothin
             } catch (IOException e) {
                 e.printStackTrace();
             }

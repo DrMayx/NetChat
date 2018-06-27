@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * Contact: mj6367@gmail.com
  */
 public class Message implements Serializable{
-    private static final long serialVersionUID = -105867315244658537L;
+    private static final long serialVersionUID = 1L;
 
     private String content;
     private String author;

@@ -1,5 +1,7 @@
 package listeners;
 
+import util.Message;
+
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -9,15 +11,21 @@ import java.net.SocketException;
 public class DisplayMessageClient extends Thread {
 
     private ObjectInputStream br;
+    String clientName;
 
-    public DisplayMessageClient(ObjectInputStream _br){
+    public DisplayMessageClient(ObjectInputStream _br, String name){
         br = _br;
+        clientName = name;
     }
 
     public void run(){
         try{
+            Message message;
             while(!isInterrupted()){
-                System.out.println(br.readObject());
+                message = (Message) br.readObject();
+                if(!message.getAuthor().equals(clientName)){
+                    System.out.println(message);
+                }
             }
         }catch(EOFException eof){
             System.out.println("Host disconnected. Bye");
