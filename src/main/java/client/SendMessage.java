@@ -15,12 +15,14 @@ public class SendMessage extends Thread{
 
     public void run(){
         String input;
-        while(true){
-            input = scan.nextLine();
-            if(input.equalsIgnoreCase("exit")){
-                System.exit(901);
+        while(!isInterrupted()){
+            if((input = scan.nextLine()) != null) {
+                if (input.equalsIgnoreCase("exit")) {
+                    System.exit(901);
+                }
+                System.out.println(input);
+                pw.write(input);
             }
-            pw.write(input);
         }
     }
 }

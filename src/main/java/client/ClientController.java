@@ -32,7 +32,7 @@ public class ClientController {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             new DisplayMessage(in).start();
-            new SendMessage(out, scan);
+            new SendMessage(out, scan).start();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -35,6 +35,7 @@ public class ServerController {
     public void run() throws IOException{
         Scanner scanner = new Scanner(System.in);
         Socket clientSocket = this._serverSocket.accept();
+        System.out.println(clientSocket.getLocalAddress() + " : " + clientSocket.getPort());
 
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -50,14 +51,14 @@ public class ServerController {
 
 
         //new NewClientsListener(this._serverSocket, this._clientsList);
-        while(true){
-            if(scanner.nextLine().equalsIgnoreCase("exit")){
-                for(String client : this._clientsList.keySet()){
-                    this._clientsList.get(client).close();
-                }
-                this._serverSocket.close();
-                System.exit(900);
-            }
-        }
+//        while(true){
+//            if(scanner.nextLine().equalsIgnoreCase("exit")){
+//                for(String client : this._clientsList.keySet()){
+//                    this._clientsList.get(client).close();
+//                }
+//                this._serverSocket.close();
+//                System.exit(900);
+//            }
+//        }
     }
 }
