@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
  * Contact: mj6367@gmail.com
  */
 public class Message implements Serializable{
+    private static final long serialVersionUID = 1L;
 
     private String content;
     private String author;
@@ -29,10 +30,6 @@ public class Message implements Serializable{
 
     @Override
     public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", author='" + author + '\'' +
-                ", createdTime=" + createdTime +
-                '}';
+        return author + " > " + content;
     }
 }

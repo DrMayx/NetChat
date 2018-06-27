@@ -27,7 +27,6 @@ public class SendMessageClient extends Thread{
                     if (input.equalsIgnoreCase("exit")) {
                         System.exit(901);
                     }
-                    System.out.println(input);
                     pw.writeObject(new Message(input, name));
                 }
             }
