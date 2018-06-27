@@ -26,6 +26,7 @@ public class SendMessageClient extends Thread{
             while(!isInterrupted()){
                 if((input = scan.nextLine()) != null) {
                     if (input.equalsIgnoreCase("exit")) {
+                        pw.writeObject(new Message(".exit!", name));
                         System.exit(901);
                     }
                     pw.writeObject(new Message(input, name));

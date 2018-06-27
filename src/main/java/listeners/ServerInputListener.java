@@ -44,7 +44,7 @@ public class ServerInputListener extends Thread{
         System.exit(0);
     }
 
-    private void sendMessageToAll(String message){
+    public void sendMessageToAll(String message){
         clients.forEach(client -> {
             try {
                 client.writeObject(new Message(message, "SERVER"));

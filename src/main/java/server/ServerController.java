@@ -7,6 +7,7 @@ import util.Message;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import java.util.Scanner;
@@ -14,6 +15,7 @@ import java.util.Scanner;
 public class ServerController {
     private int portNumber;
     private ServerSocket _serverSocket;
+    private static ServerInputListener serverChat;
     private static final ArrayList<Client> _clientsList = new ArrayList<>();
 
     public ServerController(int port){
@@ -32,7 +34,8 @@ public class ServerController {
 
         try {
 
-            new ServerInputListener(scanner, ServerController._clientsList).start();
+            serverChat = new ServerInputListener(scanner, ServerController._clientsList);
+            serverChat.start();
 
             while (true) {
                 Socket client = this._serverSocket.accept();
@@ -70,7 +73,29 @@ public class ServerController {
                 }
 
                 while (true) {
-                    Message message = (Message) in.readObject();
+                    Message input = new Message("null", "null");
+                    try {
+                        input = (Message) in.readObject();
+                        if(input.getContent().equals(".exit!")){
+                            throw new SocketException();
+                        }
+                    }catch(SocketException userOut){
+                        String author = input.getAuthor();
+
+                        Client user = findUser(author);
+                        _clientsList.remove(user);
+                        user = null;
+                        try {
+                            String message = "user " + author + " left the server.";
+                            System.out.println(message);
+                            serverChat.sendMessageToAll(message);
+                        }catch(NullPointerException e){
+                            String message = "Someone left the server";
+                            System.out.println(message);
+                            serverChat.sendMessageToAll(message);
+                        }
+                    }
+                    Message message = input;
                     if(thisClient.name.equals("NEW USER")){
                         out.writeObject(setClientName(thisClient, message));
                         continue;
@@ -125,6 +150,15 @@ public class ServerController {
                 client.name = message.getAuthor();
             }
             return nameSet ? "true" : "false";
+        }
+
+        private Client findUser(String name){
+            for(Client c : _clientsList){
+                if(c.name.equals(name)){
+                    return c;
+                }
+            }
+            return null;
         }
     }
 }
