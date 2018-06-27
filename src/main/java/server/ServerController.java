@@ -2,6 +2,7 @@ package server;
 
 
 import listeners.DisplayMessageServer;
+import listeners.NewClientsListener;
 import listeners.SendMessageServer;
 
 import java.io.*;
@@ -30,24 +31,17 @@ public class ServerController {
 
     public void run() throws IOException{
         Scanner scanner = new Scanner(System.in);
-        Socket clientSocket = this._serverSocket.accept();
+//        Socket clientSocket = this._serverSocket.accept();
+//
+//        System.out.println(clientSocket.getLocalAddress() + " : " + clientSocket.getPort());
+//
+//        ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+//        ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+//
+//        new DisplayMessageServer(in).start();
+//        new SendMessageServer(out, scanner, "SERVER").start();
 
-        System.out.println(clientSocket.getLocalAddress() + " : " + clientSocket.getPort());
-
-        ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-        ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-
-        new DisplayMessageServer(in).start();
-        new SendMessageServer(out, scanner, "SERVER").start();
-
-
-
-
-
-
-
-
-        //new NewClientsListener(this._serverSocket, this._clientsList);
+        new NewClientsListener(this._serverSocket, this._clientsList, scanner);
 //        while(true){
 //            if(scanner.nextLine().equalsIgnoreCase("exit")){
 //                for(String client : this._clientsList.keySet()){

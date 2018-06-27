@@ -1,31 +1,48 @@
 package listeners;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import client.Client;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
+import java.util.Scanner;
 
 public class NewClientsListener extends Thread{
 
     private ServerSocket _serverSocket;
     private Map<String, Socket> _usersList;
+    private Scanner scanner;
 
-    public NewClientsListener(ServerSocket serverSocket, Map<String, Socket> usersList){
+    public NewClientsListener(ServerSocket serverSocket, Map<String, Socket> usersList, Scanner _scanner){
         this._serverSocket = serverSocket;
         this._usersList = usersList;
+        this.scanner = _scanner;
     }
 
     public void start(){
         while(true){
             Socket client;
-            BufferedReader name;
             try {
+                String nick = null;
                 client = this._serverSocket.accept();
-                name = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                System.out.println(client.getLocalAddress() + " : " + client.getPort());
 
-                this._usersList.put(name.readLine(), client);
+                ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(client.getInputStream());
+
+                Client newClient = new Client(client, new DisplayMessageClient(in), new SendMessageClient(out,this.scanner, "NEW USER"));
+
+                newClient.startClient();
+
+                newClient.getDisplay().
+
+                while(nick == null){
+                    nick = requestName(client);
+                }
+
+
+
             }
             catch(IOException e){
                 System.out.println("Exception caught when listening on port: " + this._serverSocket.getLocalPort() +
@@ -33,4 +50,7 @@ public class NewClientsListener extends Thread{
             }
         }
     }
+
+    private String requestName(Socket client){
+        new ObjectOutputStream()
 }

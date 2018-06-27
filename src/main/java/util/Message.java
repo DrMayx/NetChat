@@ -19,6 +19,13 @@ public class Message implements Serializable{
         this.createdTime = LocalDateTime.now();
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
 
     @Override
     public String toString() {
