@@ -1,8 +1,7 @@
 package client;
 
-import listeners.DisplayMessageClient;
-import listeners.SendMessageClient;
-
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -11,30 +10,15 @@ import java.net.Socket;
  */
 public class Client {
 
-    private DisplayMessageClient display;
-    private SendMessageClient send;
-    private Socket clientSocket;
+    private ObjectOutputStream out;
+    public String name;
 
-    public Client(Socket _clientSocket, DisplayMessageClient _display, SendMessageClient _send) {
-        this.clientSocket = _clientSocket;
-        this.display = _display;
-        this.send = _send;
+    public Client(ObjectOutputStream out) {
+        this.out = out;
+        name = "NEW USER";
     }
 
-    public DisplayMessageClient getDisplay() {
-        return display;
-    }
-
-    public SendMessageClient getSend() {
-        return send;
-    }
-
-    public Socket getClientSocket() {
-        return clientSocket;
-    }
-
-    public void startClient(){
-        this.display.start();
-        this.send.start();
+    public void writeObject(Object object) throws IOException{
+        this.out.writeObject(object);
     }
 }

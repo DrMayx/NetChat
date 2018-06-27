@@ -1,6 +1,7 @@
 package listeners;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
@@ -18,8 +19,15 @@ public class DisplayMessageClient extends Thread {
             while(!isInterrupted()){
                 System.out.println(br.readObject());
             }
-        }
-        catch(IOException | ClassNotFoundException e){
+        }catch(EOFException eof){
+            System.out.println("Host disconnected. Bye");
+            try {
+                this.sleep(1000);
+            }catch(InterruptedException ie){
+                ///noting
+            }
+            System.exit(0);
+        }catch(IOException | ClassNotFoundException e){
             System.err.println("Error reading Object!");
             e.printStackTrace();
             this.interrupt();
