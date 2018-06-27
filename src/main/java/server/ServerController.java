@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ServerController {
+    private static int userID = 0;
     private int portNumber;
     private ServerSocket _serverSocket;
     private static ServerInputListener serverChat;
@@ -54,6 +55,7 @@ public class ServerController {
     private static class IncomingRequestHandler extends Thread {
 
         private final Socket socket;
+        private Client thisClient;
 
         public IncomingRequestHandler(Socket socket) {
 
@@ -67,7 +69,7 @@ public class ServerController {
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 
-                Client thisClient = new Client(out);
+                thisClient = new Client(out, userID++);
                 synchronized (_clientsList) {
                     _clientsList.add(thisClient);
                 }
@@ -94,13 +96,16 @@ public class ServerController {
                             System.out.println(message);
                             serverChat.sendMessageToAll(message);
                         }
+                    }catch(EOFException ex){
+                        System.out.println(thisClient.name + " left.");
+                        _clientsList.remove(thisClient);
+                        return;
                     }
                     Message message = input;
                     if(thisClient.name.equals("NEW USER")){
                         out.writeObject(setClientName(thisClient, message));
                         continue;
                     }
-
                     if(message.getContent().startsWith("@")){
                         String target = message.getContent().split(" ")[0].replaceFirst("@","");
                         String content = message.getContent().replaceFirst("@" + target, "");
@@ -118,9 +123,8 @@ public class ServerController {
                             try {
                                 client.writeObject(message);
                             } catch (IOException e) {
-                                //e.printStackTrace();
                                 System.out.println("Error with sending message to client!");
-                                ;
+                                System.out.println(e.getMessage());
                                 return;
                             }
                         });

@@ -12,10 +12,12 @@ public class Client {
 
     private ObjectOutputStream out;
     public String name;
+    public int id;
 
-    public Client(ObjectOutputStream out) {
+    public Client(ObjectOutputStream out, int id) {
         this.out = out;
-        name = "NEW USER";
+        this.id = id;
+        this.name = "NEW USER";
     }
 
     public void writeObject(Object object) throws IOException{
