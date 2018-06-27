@@ -75,23 +75,31 @@ public class ServerController {
                         out.writeObject(setClientName(thisClient, message));
                         continue;
                     }
-                    _clientsList.forEach(client -> {
-                        try {
-                            if(message.getContent().startsWith("@")){
-                                String target = message.getContent().split(" ")[0].replace("@", "");
-                                String content = message.getContent().replaceFirst("@"+target, "");
-                                client.writeObject("Direct Message to " + target + " >> " + content);
-                            }
-                            else {
-                                client.writeObject(message);
-                            }
 
-                        } catch (IOException e) {
-                            //e.printStackTrace();
-                            System.out.println("Error with sending message to client!");;
-                            return;
-                        }
-                    });
+                    if(message.getContent().startsWith("@")){
+                        String target = message.getContent().split(" ")[0].replaceFirst("@","");
+                        String content = message.getContent().replaceFirst("@" + target, "");
+                        _clientsList.forEach(client -> {
+                            try{
+                                if(client.name.equals(target)){
+                                    client.writeObject(new Message(content, "PRIVATE::" + message.getAuthor()));
+                                }
+                            }catch(IOException e){
+                                System.out.println("error sending!");
+                            }
+                        });
+                    } else {
+                        _clientsList.forEach(client -> {
+                            try {
+                                client.writeObject(message);
+                            } catch (IOException e) {
+                                //e.printStackTrace();
+                                System.out.println("Error with sending message to client!");
+                                ;
+                                return;
+                            }
+                        });
+                    }
                     if(!message.getAuthor().equals("SERVER")) {
                         System.out.println(message);
                     }
