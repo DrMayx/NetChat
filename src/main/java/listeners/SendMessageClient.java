@@ -21,6 +21,7 @@ public class SendMessageClient extends Thread{
 
     public void run(){
         String input;
+        System.out.println("Now you can start chatting! \n");
         try{
             while(!isInterrupted()){
                 if((input = scan.nextLine()) != null) {

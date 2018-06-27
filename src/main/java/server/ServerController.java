@@ -85,15 +85,16 @@ public class ServerController {
                             else {
                                 client.writeObject(message);
                             }
-                            if(!message.getAuthor().equals("SERVER")) {
-                                System.out.println(message);
-                            }
+
                         } catch (IOException e) {
                             //e.printStackTrace();
                             System.out.println("Error with sending message to client!");;
                             return;
                         }
                     });
+                    if(!message.getAuthor().equals("SERVER")) {
+                        System.out.println(message);
+                    }
                 }
 
 
