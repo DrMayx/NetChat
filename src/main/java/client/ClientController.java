@@ -1,9 +1,9 @@
 package client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import listeners.DisplayMessageClient;
+import listeners.SendMessageClient;
+
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -27,12 +27,12 @@ public class ClientController {
         this._clientName = nick;
 
         try {
-            socket  = new Socket(this._hostName, this._portNumber);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socket = new Socket(this._hostName, this._portNumber);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            new DisplayMessage(in).start();
-            new SendMessage(out, scan).start();
+            new DisplayMessageClient(in).start();
+            new SendMessageClient(out, scan, this._clientName).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
