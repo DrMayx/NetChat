@@ -123,11 +123,9 @@ public class ServerController {
         private Client findUser(String name){
             for(Client c : clientsList){
                 if(c.name.equals(name)){
-                    System.out.println("---" + c.name);
                     return c;
                 }
             }
-            System.out.println("nie znalazlem");
             return null;
         }
 
