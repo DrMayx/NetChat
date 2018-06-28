@@ -17,7 +17,8 @@ public class ServerController {
     private int portNumber;
     private ServerSocket _serverSocket;
     private static ServerInputListener serverChat;
-    private static final ArrayList<Client> _clientsList = new ArrayList<>();
+    public static final ArrayList<Client> clientsList = new ArrayList<>();
+    public static ArrayList<IncomingRequestHandler> irhs = new ArrayList<>();
 
     public ServerController(int port){
         this.portNumber = port;
@@ -35,14 +36,16 @@ public class ServerController {
 
         try {
 
-            serverChat = new ServerInputListener(scanner, ServerController._clientsList);
+            serverChat = new ServerInputListener(scanner, ServerController.clientsList);
             serverChat.start();
 
             while (true) {
                 Socket client = this._serverSocket.accept();
                 System.out.println("User connected at " + client.getLocalAddress() + ":" + client.getPort());
 
-                new IncomingRequestHandler(client).start();
+                IncomingRequestHandler irh = new IncomingRequestHandler(client);
+                irhs.add(irh);
+                irh.start();
             }
 
         }catch(IOException e ){
@@ -70,68 +73,29 @@ public class ServerController {
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 
                 thisClient = new Client(out, userID++);
-                synchronized (_clientsList) {
-                    _clientsList.add(thisClient);
+                synchronized (clientsList) {
+                    clientsList.add(thisClient);
                 }
 
                 while (true) {
-                    Message input = new Message("null", "null");
-                    try {
-                        input = (Message) in.readObject();
-                        if(input.getContent().equals(".exit!")){
-                            throw new SocketException();
-                        }
-                    }catch(SocketException userOut){
-                        String author = input.getAuthor();
 
-                        Client user = findUser(author);
-                        _clientsList.remove(user);
-                        user = null;
-                        try {
-                            String message = "user " + author + " left the server.";
-                            System.out.println(message);
-                            serverChat.sendMessageToAll(message);
-                        }catch(NullPointerException e){
-                            String message = "Someone left the server";
-                            System.out.println(message);
-                            serverChat.sendMessageToAll(message);
-                        }
-                    }catch(EOFException ex){
-                        System.out.println(thisClient.name + " left.");
-                        _clientsList.remove(thisClient);
+                    Message message = checkForUserLeft(in);
+                    if(message == null){
                         return;
                     }
-                    Message message = input;
                     if(thisClient.name.equals("NEW USER")){
                         out.writeObject(setClientName(thisClient, message));
                         continue;
                     }
                     if(message.getContent().startsWith("@")){
-                        String target = message.getContent().split(" ")[0].replaceFirst("@","");
-                        String content = message.getContent().replaceFirst("@" + target, "");
-                        _clientsList.forEach(client -> {
-                            try{
-                                if(client.name.equals(target)){
-                                    client.writeObject(new Message(content, "PRIVATE::" + message.getAuthor()));
-                                }
-                            }catch(IOException e){
-                                System.out.println("error sending!");
-                            }
-                        });
-                    } else {
-                        _clientsList.forEach(client -> {
-                            try {
-                                client.writeObject(message);
-                            } catch (IOException e) {
-                                System.out.println("Error with sending message to client!");
-                                System.out.println(e.getMessage());
-                                return;
-                            }
-                        });
+                        sendPrivateMessage(message);
+                    } else if(!message.getContent().startsWith(".")){
+                        sendNormalMessage(message);
                     }
-                    if(!message.getAuthor().equals("SERVER")) {
-                        System.out.println(message);
+                    if(message.getAuthor().equals("SERVER")){
+                        continue;
                     }
+                    System.out.println(message);
                 }
 
 
@@ -145,7 +109,7 @@ public class ServerController {
 
         private String setClientName(Client client, Message message){
             boolean nameSet = true;
-            for(Client c : _clientsList){
+            for(Client c : clientsList){
                 if(c.name.equals(message.getAuthor())){
                     nameSet = false;
                 }
@@ -157,12 +121,63 @@ public class ServerController {
         }
 
         private Client findUser(String name){
-            for(Client c : _clientsList){
+            for(Client c : clientsList){
                 if(c.name.equals(name)){
                     return c;
                 }
             }
             return null;
+        }
+
+        private void sendPrivateMessage(Message message){
+            String target = message.getContent().split(" ")[0].replaceFirst("@","");
+            String content = message.getContent().replaceFirst("@" + target, "");
+            clientsList.forEach(client -> {
+                try{
+                    if(client.name.equals(target)){
+                        client.writeObject(new Message(content, "PRIVATE::" + message.getAuthor()));
+                    }
+                }catch(IOException e){
+                    System.out.println("error sending!");
+                }
+            });
+        }
+
+        private void sendNormalMessage(Message message){
+            clientsList.forEach(client -> {
+                try {
+                    client.writeObject(message);
+                } catch (IOException e) {
+                    System.out.println("Error with sending message to client!");
+                    System.out.println(e.getMessage());
+                    return;
+                }
+            });
+        }
+
+        private Message checkForUserLeft(ObjectInputStream in) throws ClassNotFoundException, IOException{
+            Message input = new Message("null", "null");
+            try {
+                input = (Message) in.readObject();
+                if(input.getContent().equals(".exit!")){
+                    throw new SocketException();
+                }
+            }catch(SocketException userOut){
+                String author = input.getAuthor();
+
+                Client user = findUser(author);
+                clientsList.remove(user);
+                user = null;
+            }catch(EOFException ex){
+                String message = thisClient.name + " left.";
+                System.out.println(message);
+                serverChat.sendMessageToAll(message);
+                this.interrupt();
+                irhs.remove(this);
+                clientsList.remove(thisClient);
+                return null;
+            }
+            return input;
         }
     }
 }
