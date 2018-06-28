@@ -123,9 +123,11 @@ public class ServerController {
         private Client findUser(String name){
             for(Client c : clientsList){
                 if(c.name.equals(name)){
+                    System.out.println("---" + c.name);
                     return c;
                 }
             }
+            System.out.println("nie znalazlem");
             return null;
         }
 
@@ -156,7 +158,7 @@ public class ServerController {
         }
 
         private Message checkForUserLeft(ObjectInputStream in) throws ClassNotFoundException, IOException{
-            Message input = new Message("null", "null");
+            Message input = new Message(".exit!", "SERVER");
             try {
                 input = (Message) in.readObject();
                 if(input.getContent().equals(".exit!")){
@@ -165,12 +167,13 @@ public class ServerController {
             }catch(SocketException userOut){
                 String author = input.getAuthor();
 
+                if(input.getAuthor().equals("SERVER")){
+                    return null;
+                }
                 Client user = findUser(author);
                 user.closeStream();
                 clientsList.remove(user);
                 user = null;
-                System.out.println("KURWAAAA");
-                try{this.sleep(10000);}catch(InterruptedException e){e.printStackTrace();}
             }catch(EOFException ex){
                 String message = thisClient.name + " left.";
                 System.out.println(message);
