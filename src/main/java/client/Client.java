@@ -23,4 +23,8 @@ public class Client {
     public void writeObject(Object object) throws IOException{
         this.out.writeObject(object);
     }
+
+    public void closeStream()throws IOException{
+        this.out.close();
+    }
 }

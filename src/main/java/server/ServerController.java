@@ -166,12 +166,16 @@ public class ServerController {
                 String author = input.getAuthor();
 
                 Client user = findUser(author);
+                user.closeStream();
                 clientsList.remove(user);
                 user = null;
+                System.out.println("KURWAAAA");
+                try{this.sleep(10000);}catch(InterruptedException e){e.printStackTrace();}
             }catch(EOFException ex){
                 String message = thisClient.name + " left.";
                 System.out.println(message);
                 serverChat.sendMessageToAll(message);
+                this.socket.close();
                 this.interrupt();
                 irhs.remove(this);
                 clientsList.remove(thisClient);
